@@ -1,9 +1,13 @@
 import { Server } from "socket.io";
 
-const io = new Server(3000, { /* options */ });
+export default {
+    start: (port: number) => {
+        const io = new Server(port, { /* options */ });
 
-io.on("connection", (socket) => {
-    console.log('new connection')
-});
+        io.on("connection", (socket) => {
+            console.log('new connection')
+        });
 
-module.exports={socket: io};
+        return io;
+    }
+}
