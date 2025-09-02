@@ -4,12 +4,13 @@ import { NextResponse } from "next/server";
 import { redirect, RedirectType } from 'next/navigation'
 
 export async function GET(req: NextRequest){
+    const searchParams = req.nextUrl.searchParams
+    const code = searchParams.get('code');
+    // TODO: Logic to check this against initail state to protect agains xsr attacks
+    const state = searchParams.get('state')
+
     let server_info = null;
     try{
-        const searchParams = req.nextUrl.searchParams
-        const code = searchParams.get('code');
-        // TODO: Logic to check this against initail state to protect agains xsr attacks
-        const state = searchParams.get('state')
         // Add code to start server room and redirect to room
         if(code){
             // TODO: fix type

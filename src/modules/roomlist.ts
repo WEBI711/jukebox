@@ -1,5 +1,6 @@
 import Room from "./room";
-import tokenManager from "./spotifyTokenManager";
+import spotifyHandler from "./spotifyHandler";
+import spotify_handler from "./spotifyHandler";
 interface IRoomlist{
     rooms: Room[];
     port_series: number;
@@ -22,10 +23,15 @@ class roomlist implements IRoomlist {
     }
     async add(spotify_auth_code: string){
         let taken_ports = this.taken_ports(this.rooms);
-        let token = await tokenManager.getToken(spotify_auth_code);
+
+        let spotify_handler = new spotifyHandler(spotify_auth_code);
+        let response_obj = await spotify_handler.token_request(spotify_auth_code);
+        if(response_obj)
+            spotify_handler.token_object = response_obj;
+
         let new_port = this.available_port(taken_ports)
-        if(new_port && token){
-            let room = await new Room(new_port, spotify_auth_code, token);
+        if(new_port && response_obj){
+            let room = await new Room(new_port, spotify_handler);
             this.rooms.push(room);
             return room
         }

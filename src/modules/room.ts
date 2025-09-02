@@ -1,21 +1,19 @@
 import { Server } from "socket.io";
+import spotifyHandler from "./spotifyHandler";
 interface IRoom {
     socket: Server | null;
     port: number;
-    auth_code: string;
-    token: any;
+    spotify_handler: spotifyHandler;
 }
 export default class room implements IRoom {
     room_id: string;
     socket: Server | null;
-    auth_code: string;
-    token: any;
+    spotify_handler: spotifyHandler;
     port: number;
-    constructor(port: number, auth_code: string, token: any){
+    constructor(port: number, _spotify_handler: spotifyHandler){
         this.port = port;
         this.socket = null;
-        this.auth_code = auth_code;
-        this.token = token;
+        this.spotify_handler = _spotify_handler;
         this.room_id = port.toString(); // TODO: Need to replace with uuid of some sort
         this.initialize_socket(port);
     }

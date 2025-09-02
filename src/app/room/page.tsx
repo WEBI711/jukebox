@@ -7,7 +7,7 @@ export default async function Room({searchParams}: roomProps){
     searchParams = await searchParams;
     console.log(room_list.get_list())
     let room = room_list.get_room(searchParams.room_id)
-    let access_token = room?.token?.access_token || null
+    let access_token = room?.spotify_handler?.token_object?.access_token || null
     if(access_token){
         return(
             <div>
