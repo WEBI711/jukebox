@@ -25,9 +25,6 @@ export async function GET(req: Request){
     sptify_loginURL.searchParams.set('state', state);
     sptify_loginURL.searchParams.set('redirect_uri', redirect_uri);
 
-    // TESTING REMOVE
-    let str = sptify_loginURL.toString()
-
     return NextResponse.redirect(sptify_loginURL.toString())
 }
 
