@@ -3,6 +3,7 @@ import tokenManager from "./spotifyTokenManager";
 interface IRoomlist{
     rooms: Room[];
     port_series: number;
+    add: (spotify_auth_code: string) => Promise<Room>;
     get_list: () => Room[];
     taken_ports: (list: Room[]) => number[];
     available_port: (taken_ports: number[]) => number | null;
@@ -19,12 +20,12 @@ class roomlist implements IRoomlist {
     get_list(){
         return this.rooms;
     }
-    async add_server(spotify_auth_code: string){
+    async add(spotify_auth_code: string){
         let taken_ports = this.taken_ports(this.rooms);
         let token = await tokenManager.getToken(spotify_auth_code);
         let new_port = this.available_port(taken_ports)
         if(new_port && token){
-            let room = new Room(new_port, spotify_auth_code, token);
+            let room = await new Room(new_port, spotify_auth_code, token);
             this.rooms.push(room);
             return room
         }
