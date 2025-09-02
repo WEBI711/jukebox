@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import crypto from 'crypto';
 const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
+const redirect_uri = process.env.SPOTIFY_REDIRECT_URI || '';
 
 export async function GET(req: Request){
     if(!client_id || !client_secret){
         return NextResponse.json({error: "Spotify client_id or client_secret not configured"})
     }
-    var redirect_uri = "http://localhost:3000/api/spotifylogin/callback"
     var state = generateSecureRandomString(16);
     var scope = [
         "streaming",
