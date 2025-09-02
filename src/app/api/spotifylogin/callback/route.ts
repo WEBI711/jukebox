@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { NextResponse } from "next/server";
 import { redirect, RedirectType } from 'next/navigation'
-import server_list from '@/modules/serverlist';
+import room_list from '@/modules/roomlist';
 
 export async function GET(req: NextRequest){
     let server_info = null;
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest){
         // Add code to start server room and redirect to room
         if(code){
             // TODO: fix type
-            server_info = await server_list.add_server(code)
+            server_info = await room_list.add(code)
         }
     } catch(err) {
         console.log(err)

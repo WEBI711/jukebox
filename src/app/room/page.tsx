@@ -1,12 +1,12 @@
-import serverlist from '@/modules/serverlist'
+import room_list from '@/modules/roomlist'
 import SpotifyPlayer from '@/components/spotifyplayer'
 type roomProps = {
     searchParams: {room_id: string,}
 }
 export default async function Room({searchParams}: roomProps){
     searchParams = await searchParams;
-    console.log(serverlist.get_list())
-    let room = serverlist.get_room(searchParams.room_id)
+    console.log(room_list.get_list())
+    let room = room_list.get_room(searchParams.room_id)
     let access_token = room?.token?.access_token || null
     if(access_token){
         return(
