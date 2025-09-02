@@ -1,4 +1,4 @@
-import room_list from '@/modules/roomlist'
+import room_list from '@/modules/roomList'
 import SpotifyPlayer from '@/components/spotifyplayer'
 type roomProps = {
     searchParams: {room_id: string,}
