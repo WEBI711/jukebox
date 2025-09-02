@@ -1,7 +1,7 @@
+import room_list from '@/modules/roomList';
 import { NextRequest } from 'next/server'
 import { NextResponse } from "next/server";
 import { redirect, RedirectType } from 'next/navigation'
-import room_list from '@/modules/roomList';
 
 export async function GET(req: NextRequest){
     let server_info = null;
