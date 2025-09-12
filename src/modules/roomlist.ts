@@ -1,14 +1,11 @@
 import Room from "./room";
 import spotifyHandler from "./spotifyHandler";
 import spotify_handler from "./spotifyHandler";
-import server from './socket-io_server'
 interface IRoomlist{
     rooms: Room[];
     port_series: number;
-    add: (spotify_auth_code: string) => Promise<Room>;
-    get_list: () => Room[];
-    taken_ports: (list: Room[]) => number[];
-    available_port: (taken_ports: number[]) => number | null;
+    add: (spotify_auth_code: string, room_id: string) => Promise<Room>; // add a room using {spotify_token_info, user_socket_id, room_name, room_id}
+    get_list: () => Room[]; // get list of all available rooms
     get_room: (room_id: string) => Room | null;
 }
 
@@ -22,41 +19,19 @@ class roomlist implements IRoomlist {
     get_list(){
         return this.rooms;
     }
-    async add(spotify_auth_code: string){
-        let taken_ports = this.taken_ports(this.rooms);
-
+    async add(spotify_auth_code: string, room_id: string){
         let spotify_handler = new spotifyHandler(spotify_auth_code);
         let response_obj = await spotify_handler.token_request(spotify_auth_code);
         if(response_obj)
             spotify_handler.token_object = response_obj;
-
-        let new_port = this.available_port(taken_ports)
-        if(new_port && response_obj){
-            let room = await new Room(new_port, spotify_handler);
+        if(response_obj){
+            let room = await new Room(spotify_handler, room_id);
             this.rooms.push(room);
             return room
         }
         else{
             throw new Error("Unable to add room. port or token info missing.");
         }
-    }
-    taken_ports(rooms: any[]): number[]{
-        let port_list = [];
-        for(let room of rooms){
-            let port = room.port;
-            port_list.push(port)
-        }
-        return port_list;
-    }
-    available_port(taken_ports: number[]): number|null{
-        let new_port = this.port_series;
-        for(let i = 0; i < 10; i++){
-            if(!taken_ports.includes(new_port)){
-                return new_port
-            }
-            new_port += 1
-        }
-        return null
     }
     get_room(room_id: string){
         let room = this.rooms.filter(item => item.room_id == room_id)?.[0] || null;

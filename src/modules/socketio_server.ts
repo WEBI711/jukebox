@@ -29,6 +29,11 @@ class socket_server {
             console.log(`Error initialising socket instance for room. port_number: ${this.port}`)
         }
     }
+    check(){
+        if(this.server)
+            return true;
+        return false;
+    }
 }
 // --- Singleton pattern ---
 const globalForServerList = global as unknown as { server?: socket_server };

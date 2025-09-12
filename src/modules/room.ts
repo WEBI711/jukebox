@@ -1,31 +1,20 @@
-import { Server } from "socket.io";
+import { Socket } from "socket.io-client";
 import spotifyHandler from "./spotifyHandler";
 interface IRoom {
-    socket: Server | null;
-    port: number;
+    socket: Socket | null;
     spotify_handler: spotifyHandler;
+    room_id: string,
 }
 export default class room implements IRoom {
     room_id: string;
-    socket: Server | null;
+    socket: Socket | null;
     spotify_handler: spotifyHandler;
-    port: number;
-    constructor(port: number, _spotify_handler: spotifyHandler){
-        this.port = port;
-        this.socket = null;
+    constructor(_spotify_handler: spotifyHandler, room_id: string){
+        this.room_id = room_id
         this.spotify_handler = _spotify_handler;
-        this.room_id = port.toString(); // TODO: Need to replace with uuid of some sort
-        this.initialize_socket(port);
+        this.socket = null;
     }
-    initialize_socket(port: number){
-        try{
-            const io = new Server(port, { /* options */ });
-            io.on("connection", (socket) => {
-                console.log('new connection')
-            });
-            this.socket = io;
-        } catch (err){
-            console.log(`Error initialising socket instance for room. port_number: ${port}`)
-        }
+    add_socket(socket: Socket){
+        this.socket = socket;
     }
 }

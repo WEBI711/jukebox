@@ -11,10 +11,10 @@ export async function GET(req: NextRequest){
 
     let server_info = null;
     try{
-        // Add code to start server room and redirect to room
         if(code){
-            // TODO: fix type
-            server_info = await room_list.add(code)
+            const uuid = crypto.randomUUID();
+            console.log(uuid); // Example: "f81e7af3-fcf4-4cdd-b3a3-14a8087aa191"
+            server_info = await room_list.add(code, uuid)
         }
     } catch(err) {
         console.log(err)

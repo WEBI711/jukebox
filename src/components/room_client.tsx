@@ -18,7 +18,7 @@ type track = {
 type propsType = {
     access_token: string,
     tracks: track,
-    server_socket_port: string,
+    room_id: string,
 }
 export default function RoomClient(props: propsType){
     const [socket, setSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null)
@@ -29,7 +29,7 @@ export default function RoomClient(props: propsType){
         });
         _socket.on('connect', () => {
             console.log('connected')
-            _socket.emit('joinRoom',"room")
+            _socket.emit('joinRoom',props.room_id)
         })
         setSocket(_socket);
     },[])

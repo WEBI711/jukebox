@@ -1,6 +1,9 @@
 import {TypewriterEffectSmooth} from '@/components/ui/typewriter-effect'
 import HomePageButtons from '@/components/homepage-buttons';
+import server from '@/modules/socketio_server';
 export default function Home(){
+    if(server.check())
+        console.log("Server socket is up and running")
     const words = [
         { text: "Welcome", },
         { text: "to", },

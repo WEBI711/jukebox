@@ -6,13 +6,12 @@ type roomProps = {
 }
 export default async function Room({searchParams}: roomProps){
     searchParams = await searchParams;
-    console.log(room_list.get_list())
     let room = room_list.get_room(searchParams.room_id)
     let access_token = room?.spotify_handler?.token_object?.access_token || null
     if(access_token){
         return(
             <div className='flex items-center justify-center size-full'>
-                <RoomClient access_token={access_token} tracks={tracksobject.tracks} server_socket_port={searchParams.room_id}/>
+                <RoomClient access_token={access_token} tracks={tracksobject.tracks} room_id={searchParams.room_id}/>
             </div>
         )
     }
