@@ -1,10 +1,11 @@
 import { Server } from "socket.io";
-import {ClientToServerEvents, ServerToClientEvents} from "@/types/socketTypes"
+import { ClientToServerEvents, ServerToClientEvents } from "@/types/socketTypes"
+import room_list from "./roomList";
 class socket_server {
     server;
-    port=4000;
-    constructor(){
-        try{
+    port = 4000;
+    constructor() {
+        try {
             const io = new Server(4000, {
                 cors: {
                     origin: "*",
@@ -18,19 +19,27 @@ class socket_server {
                 socket.onAny((event, ...args) => {
                     console.log("📩 server got event:", event, args);
                 });
-                socket.on('joinRoom', (room) => {
-                    console.log(`socket joined room: ${room}`)
-                    socket.join(room);
+                socket.on('joinRoom', (room_id) => {
+                    // check if room exists
+                    let room = room_list.get_room(room_id)
+                    if (room) {
+                        // if room exists emit roomJoined
+                        console.log(`socket joined room: ${room_id}`)
+                        socket.join(room_id);
+                        socket.emit('roomJoined');
+                        return
+                    }
+                    // if room doesnt exist emit errorJoiningRoom
+                    socket.emit('errorJoiningRoom');
                 })
-
             });
             this.server = io;
-        } catch (err){
+        } catch (err) {
             console.log(`Error initialising socket instance for room. port_number: ${this.port}`)
         }
     }
-    check(){
-        if(this.server)
+    check() {
+        if (this.server)
             return true;
         return false;
     }
@@ -39,10 +48,10 @@ class socket_server {
 const globalForServerList = global as unknown as { server?: socket_server };
 
 const server =
-  globalForServerList.server ?? new socket_server();
+    globalForServerList.server ?? new socket_server();
 
 if (!globalForServerList.server) {
-  globalForServerList.server = server;
+    globalForServerList.server = server;
 }
 
 export default server;

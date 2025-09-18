@@ -7,10 +7,10 @@ type roomProps = {
 export default async function Room({ searchParams }: roomProps) {
   searchParams = await searchParams;
   let room = room_list.get_room(searchParams.room_id);
-  let access_token = room?.spotify_handler?.token_object?.access_token || null;
+  let access_token = room?.token_info?.access_token || null;
   if (access_token) {
     return (
-      <div className="flex items-center justify-center size-full">
+      <div className="h-screen w-screen">
         <RoomClient
           access_token={access_token}
           tracks={tracksobject.tracks}

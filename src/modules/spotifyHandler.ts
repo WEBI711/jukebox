@@ -7,13 +7,13 @@ import { redirect, RedirectType } from 'next/navigation'
 export default class spotifyHandler {
     auth_code: string;
     token_object: any;
-    constructor(auth_code: string){
+    constructor(auth_code: string) {
         this.auth_code = auth_code
         this.token_object = null;
     }
-    static auth_code_request(){
-        if(!client_id || !client_secret){
-            console.log( "Spotify client_id or client_secret not configured")
+    static auth_code_request() {
+        if (!client_id || !client_secret) {
+            console.log("Spotify client_id or client_secret not configured")
         }
         var state = generateSecureRandomString(16);
         var scope = [
@@ -34,34 +34,34 @@ export default class spotifyHandler {
 
         redirect(sptify_loginURL.toString(), RedirectType.push);
     }
-    async token_request(auth_code: string){
+    static async token_request(auth_code: string) {
         let response = null
-        try{
-            response = await fetch('https://accounts.spotify.com/api/token',{
+        try {
+            response = await fetch('https://accounts.spotify.com/api/token', {
                 method: 'POST',
                 body: new URLSearchParams({
                     code: `${auth_code}`,
                     redirect_uri: redirect_uri || '',
                     grant_type: 'authorization_code'
                 }),
-                headers:{
+                headers: {
                     'content-type': 'application/x-www-form-urlencoded',
                     'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64'))
                 }
             })
-        } catch(err){
+        } catch (err) {
             console.log(err)
         }
-        if(response && response.ok){
+        if (response && response.ok) {
             response = await response.json();
         }
         return response
     }
-} 
+}
 
 function generateSecureRandomString(length = 16) {
-  return crypto.randomBytes(length)
-    .toString("base64") // encodes as base64
-    .replace(/[^a-zA-Z0-9]/g, "") // remove non-alphanumerics
-    .slice(0, length);
+    return crypto.randomBytes(length)
+        .toString("base64") // encodes as base64
+        .replace(/[^a-zA-Z0-9]/g, "") // remove non-alphanumerics
+        .slice(0, length);
 }
