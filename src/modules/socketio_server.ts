@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import { ClientToServerEvents, ServerToClientEvents } from "@/types/socketTypes"
 import room_list from "./roomList";
+import spotifyHandler from "./spotifyHandler";
 class socket_server {
     server;
     port = 4000;
@@ -31,6 +32,11 @@ class socket_server {
                     }
                     // if room doesnt exist emit errorJoiningRoom
                     socket.emit('errorJoiningRoom');
+                })
+                socket.on('play', (room_id, uri) => {
+                    let room = room_list.get_room(room_id);
+                    let token_info = room.token_info;
+                    spotifyHandler.play_song(uri, token_info);
                 })
             });
             this.server = io;

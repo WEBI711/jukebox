@@ -28,6 +28,7 @@ type propsType = {
 export default function RoomClient(props: propsType) {
   const [search, setSearch] = useState("");
   const [screen, setScreen] = useState<string>("home");
+  const [searchedTracks, setSearchedTracks] = useState<any>(props.tracks);
   const [socket, setSocket] = useState<Socket<
     ServerToClientEvents,
     ClientToServerEvents
@@ -58,11 +59,17 @@ export default function RoomClient(props: propsType) {
   }, []);
 
   const searchHandler = async () => {
-    let track_obj = await fetch(
+    let search_request = await fetch(
       `/api/spotifysearch?roomid=${encodeURIComponent(
         props.room_id
       )}&value=${encodeURIComponent(search)}`
     );
+    let track_object = await search_request.json();
+    setSearchedTracks(track_object.trackData.tracks);
+  };
+
+  const playHandler = (uri: string) => {
+    socket?.emit("play", props.room_id, uri);
   };
 
   function SearchScreen() {
@@ -86,7 +93,34 @@ export default function RoomClient(props: propsType) {
         </div>
 
         <ScrollArea className="size-full rounded-md border p-4">
-          <div className="size-full overflow-hidden"></div>
+          <div className="size-full overflow-hidden">
+            {searchedTracks?.items?.map((item: any) => {
+              let img = item?.album?.images.reduce(
+                (smallest: imageType, curr: imageType) => {
+                  if (curr.width < smallest.width) return curr;
+                  return smallest;
+                }
+              );
+              return (
+                <div className="w-full h-auto" key={item.id}>
+                  <div
+                    className="flex justify-start items-center w-full min-h-[100px] my-1 p-3 rounded-2xl hover:bg-neutral-700 cursor-pointer"
+                    onClick={() => playHandler(item.uri)}
+                  >
+                    <Avatar>
+                      <AvatarImage src={img.url}></AvatarImage>
+                      <AvatarFallback>Song</AvatarFallback>
+                    </Avatar>
+                    <div className="p-3 overflow-hidden">
+                      <p className="text-xl">{item.name}</p>
+                      <p className="text-xs">{item.album.name}</p>
+                    </div>
+                  </div>
+                  <Separator />
+                </div>
+              );
+            })}
+          </div>
         </ScrollArea>
       </div>
     );
@@ -105,7 +139,7 @@ export default function RoomClient(props: propsType) {
                 }
               );
               return (
-                <div className="w-full h-auto">
+                <div className="w-full h-auto" key={item.id}>
                   <div className="flex justify-start items-center w-full min-h-[100px] my-1 p-3 rounded-2xl">
                     <Avatar>
                       <AvatarImage src={img.url}></AvatarImage>
@@ -137,7 +171,10 @@ export default function RoomClient(props: propsType) {
           Search
         </Button>
       </div>
-      <SpotifyPlayer access_token={props.access_token} />
+      <SpotifyPlayer
+        access_token={props.access_token}
+        room_id={props.room_id}
+      />
       {screen === "home" ? HomeScreen() : SearchScreen()}
     </div>
   );

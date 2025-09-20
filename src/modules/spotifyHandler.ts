@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { spotifyTokenInfoType } from '@/types/spotifyToken'
 const client_id = process.env.SPOTIFY_CLIENT_ID || '';
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const redirect_uri = process.env.SPOTIFY_REDIRECT_URI || '';
@@ -54,6 +55,61 @@ export default class spotifyHandler {
         }
         if (response && response.ok) {
             response = await response.json();
+        }
+        return response
+    }
+    static async search_song(query: string, token_info: spotifyTokenInfoType) {
+        let response = null
+        try {
+            const base_url = "https://api.spotify.com/v1/search?"
+            const queryParams = new URLSearchParams({ q: query, type: "track" })
+            const url = base_url + queryParams.toString()
+            response = await fetch(url, {
+                headers: {
+                    'Authorization': 'Bearer ' + token_info.access_token,
+                }
+            })
+            response = await response.json()
+        } catch (err) {
+            console.log(err)
+        }
+        return response
+    }
+    static async play_song(uri: string, token_info: spotifyTokenInfoType) {
+        let response = null
+        try {
+            const base_url = "https://api.spotify.com/v1/me/player/play"
+            const url = base_url
+            response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer ' + token_info.access_token,
+                },
+                body: JSON.stringify({
+                    'uris': [uri]
+                })
+            })
+            response = await response.json()
+        } catch (err) {
+            console.log(err)
+        }
+        return response
+    }
+
+    static async transfer_playback(player_id: string, access_token: string) {
+        let response = null
+        try {
+            const base_url = "https://api.spotify.com/v1/me/player"
+            const url = base_url
+            response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer ' + access_token,
+                },
+                body: JSON.stringify({ device_ids: [player_id] })
+            })
+        } catch (err) {
+            console.log(err)
         }
         return response
     }
