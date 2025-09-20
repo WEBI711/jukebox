@@ -86,31 +86,7 @@ export default function RoomClient(props: propsType) {
         </div>
 
         <ScrollArea className="size-full rounded-md border p-4">
-          <div className="size-full overflow-hidden">
-            {props.tracks.items.map((item: any) => {
-              let img = item?.album?.images.reduce(
-                (smallest: imageType, curr: imageType) => {
-                  if (curr.width < smallest.width) return curr;
-                  return smallest;
-                }
-              );
-              return (
-                <div className="w-full h-auto">
-                  <div className="flex justify-start items-center w-full min-h-[100px] my-1 p-3 rounded-2xl">
-                    <Avatar>
-                      <AvatarImage src={img.url}></AvatarImage>
-                      <AvatarFallback>Song</AvatarFallback>
-                    </Avatar>
-                    <div className="p-3 overflow-hidden">
-                      <p className="text-xl">{item.name}</p>
-                      <p className="text-xs">{item.album.name}</p>
-                    </div>
-                  </div>
-                  <Separator />
-                </div>
-              );
-            })}
-          </div>
+          <div className="size-full overflow-hidden"></div>
         </ScrollArea>
       </div>
     );
@@ -119,23 +95,6 @@ export default function RoomClient(props: propsType) {
   function HomeScreen() {
     return (
       <div className="h-3/4 w-1/2">
-        <div className="flex w-full items-center gap-2 py-5">
-          <Input
-            type="text"
-            placeholder="Search"
-            onChange={(ev) => {
-              setSearch(ev.target.value);
-            }}
-          />
-          <Button
-            type="submit"
-            variant="outline"
-            onClick={(ev) => searchHandler()}
-          >
-            Search
-          </Button>
-        </div>
-
         <ScrollArea className="size-full rounded-md border p-4">
           <div className="size-full overflow-hidden">
             {props.tracks.items.map((item: any) => {
