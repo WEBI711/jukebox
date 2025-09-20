@@ -64,8 +64,11 @@ export default function RoomClient(props: propsType) {
         props.room_id
       )}&value=${encodeURIComponent(search)}`
     );
-    let track_object = await search_request.json();
-    setSearchedTracks(track_object.trackData.tracks);
+    let response = await search_request;
+    if (response.ok) {
+      let response_json = await response.json();
+      setSearchedTracks(response_json.data.tracks);
+    }
   };
 
   const playHandler = (uri: string) => {
@@ -113,7 +116,11 @@ export default function RoomClient(props: propsType) {
                     </Avatar>
                     <div className="p-3 overflow-hidden">
                       <p className="text-xl">{item.name}</p>
-                      <p className="text-xs">{item.album.name}</p>
+                      <p className="text-xs">
+                        {item?.album?.artists
+                          ?.map((artist: any) => artist.name)
+                          .join(", ")}
+                      </p>
                     </div>
                   </div>
                   <Separator />

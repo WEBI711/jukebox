@@ -69,7 +69,6 @@ export default class spotifyHandler {
                     'Authorization': 'Bearer ' + token_info.access_token,
                 }
             })
-            response = await response.json()
         } catch (err) {
             console.log(err)
         }

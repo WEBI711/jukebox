@@ -3,7 +3,6 @@ import room_list from "@/modules/roomList";
 import spotifyHandler from '@/modules/spotifyHandler'
 
 export async function GET(req: NextRequest) {
-    debugger
     const searchParams = req.nextUrl.searchParams;
     const player_id = searchParams.get('player_id');
     const room_id = searchParams.get('room_id');

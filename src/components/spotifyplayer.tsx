@@ -24,7 +24,6 @@ export default function SpotifyPlayer(props: SpotifyPlayerProps) {
 
       // Ready
       player.addListener("ready", ({ device_id }: listenerArgsTypes) => {
-        debugger;
         console.log("Ready with Device ID", device_id);
         let queryParams = new URLSearchParams({
           player_id: device_id,
