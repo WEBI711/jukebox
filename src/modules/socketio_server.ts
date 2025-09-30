@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { ClientToServerEvents, ServerToClientEvents } from "@/types/socketTypes"
-import room_list from "./roomList";
+import room_list from "./roomlist";
 import spotifyHandler from "./spotifyHandler";
 class socket_server {
     server;

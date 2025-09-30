@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import room_list from "@/modules/roomList";
+import room_list from "@/modules/roomlist";
 import spotifyHandler from '@/modules/spotifyHandler'
 
 export async function GET(req: NextRequest) {

@@ -1,4 +1,4 @@
-import room_list from "@/modules/roomList";
+import room_list from "@/modules/roomlist";
 import RoomClient from "@/components/room_client";
 import tracksobject from "public/mocktracks";
 type roomProps = {

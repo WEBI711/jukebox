@@ -1,4 +1,4 @@
-import room_list from '@/modules/roomList';
+import room_list from '@/modules/roomlist';
 import spotifyHandler from "@/modules/spotifyHandler";
 import { NextRequest } from 'next/server'
 import { NextResponse } from "next/server";
