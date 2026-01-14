@@ -7,13 +7,14 @@ type roomProps = {
 export default async function Room({ searchParams }: roomProps) {
   searchParams = await searchParams;
   let room = room_list.get_room(searchParams.room_id);
+  let tracks = room.get_queue();
   let access_token = room?.token_info?.access_token || null;
   if (access_token) {
     return (
       <div className="h-screen w-screen">
         <RoomClient
           access_token={access_token}
-          tracks={tracksobject.tracks}
+          tracks={tracks}
           room_id={searchParams.room_id}
         />
       </div>
