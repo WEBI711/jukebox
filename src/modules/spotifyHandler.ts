@@ -8,10 +8,12 @@ import { redirect, RedirectType } from 'next/navigation'
 export default class spotifyHandler {
     auth_code: string;
     token_object: any;
+
     constructor(auth_code: string) {
         this.auth_code = auth_code
         this.token_object = null;
     }
+
     static auth_code_request() {
         if (!client_id || !client_secret) {
             console.log("Spotify client_id or client_secret not configured")
@@ -25,16 +27,15 @@ export default class spotifyHandler {
             "user-read-private",
             "user-read-email"
         ].join(' ');
-
         const sptify_loginURL = new URL('https://accounts.spotify.com/authorize?');
         sptify_loginURL.searchParams.set('response_type', 'code');
         sptify_loginURL.searchParams.set('client_id', client_id);
         sptify_loginURL.searchParams.set('scope', scope);
         sptify_loginURL.searchParams.set('state', state);
         sptify_loginURL.searchParams.set('redirect_uri', redirect_uri);
-
         redirect(sptify_loginURL.toString(), RedirectType.push);
     }
+
     static async token_request(auth_code: string) {
         let response = null
         try {
@@ -58,6 +59,7 @@ export default class spotifyHandler {
         }
         return response
     }
+
     static async search_song(query: string, token_info: spotifyTokenInfoType) {
         let response = null
         try {
@@ -74,6 +76,7 @@ export default class spotifyHandler {
         }
         return response
     }
+
     static async play_song(uri: string, token_info: spotifyTokenInfoType) {
         let response = null
         try {
