@@ -71,8 +71,15 @@ export default function RoomClient(props: propsType) {
     }
   };
 
-  const playHandler = (uri: string) => {
-    socket?.emit("play", props.room_id, uri);
+  const playHandler = async (uri: string) => {
+    let request = await fetch("/api/addSong", {
+      method: "POST",
+      body: JSON.stringify({
+        song_uri: uri,
+        room_id: props.room_id
+      })
+    });
+    //socket?.emit("play", props.room_id, uri);
   };
 
   function SearchScreen() {

@@ -4,6 +4,7 @@ export interface ServerToClientEvents {
   withAck: (d: string, callback: (e: number) => void) => void;
   roomJoined: () => void;
   errorJoiningRoom: () => void;
+  playlist_update: (uri: string) => void;
 }
 
 export interface ClientToServerEvents {
