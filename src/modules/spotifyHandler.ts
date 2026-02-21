@@ -115,6 +115,26 @@ export default class spotifyHandler {
     }
     return response
   }
+
+  static async get_songs_from_uris(ids: string[], access_token: string) {
+    let response = null
+    if (!ids.length) {
+      return null;
+    }
+    try {
+      const base_url = "https://api.spotify.com/v1/tracks";
+      const url = `${base_url}?ids=${ids.reduce((acc, curr) => acc + ',' + curr)}`
+      response = await fetch(url, {
+        headers: {
+          'Authorization': 'Bearer ' + access_token,
+        },
+      })
+      response = await response.json()
+    } catch (err) {
+      console.log(err)
+    }
+    return response
+  }
 }
 
 function generateSecureRandomString(length = 16) {

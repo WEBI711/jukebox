@@ -7,6 +7,7 @@ import { io, Socket } from "socket.io-client";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import type {
   ServerToClientEvents,
   ClientToServerEvents,
@@ -26,9 +27,14 @@ type propsType = {
   room_id: string;
 };
 export default function RoomClient(props: propsType) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [screen, setScreen] = useState<string>("home");
-  const [searchedTracks, setSearchedTracks] = useState<any>(props.tracks);
+  const [searchedTracks, setSearchedTracks] = useState<any>([]);
+  const [queueTracks, setQueueTracks] = useState<any>(props.tracks);
+  useEffect(() => {
+    setQueueTracks(props.tracks);
+  }, [props.tracks]);
   const [socket, setSocket] = useState<Socket<
     ServerToClientEvents,
     ClientToServerEvents
@@ -54,6 +60,10 @@ export default function RoomClient(props: propsType) {
         _socket.emit("joinRoom", props.room_id);
       }, 100000);
     });
+    _socket.on("playlist_update", (uri) => {
+      console.log(`New song added to list with uri ${uri}`);
+      router.refresh();
+    });
 
     setSocket(_socket);
   }, []);
@@ -71,12 +81,11 @@ export default function RoomClient(props: propsType) {
     }
   };
 
-  const playHandler = async (uri: string) => {
+  const playHandler = async (song_id: string) => {
     let request = await fetch("/api/addSong", {
       method: "POST",
       body: JSON.stringify({
-        song_uri: uri,
-        room_id: props.room_id
+        room_id: props.room_id, song_id
       })
     });
     //socket?.emit("play", props.room_id, uri);
@@ -115,7 +124,7 @@ export default function RoomClient(props: propsType) {
                 <div className="w-full h-auto" key={item.id}>
                   <div
                     className="flex justify-start items-center w-full min-h-[100px] my-1 p-3 rounded-2xl hover:bg-neutral-700 cursor-pointer"
-                    onClick={() => playHandler(item.uri)}
+                    onClick={() => playHandler(item.id)}
                   >
                     <Avatar>
                       <AvatarImage src={img.url}></AvatarImage>
@@ -145,29 +154,33 @@ export default function RoomClient(props: propsType) {
       <div className="h-3/4 w-1/2">
         <ScrollArea className="size-full rounded-md border p-4">
           <div className="size-full overflow-hidden">
-            {props.tracks.items.map((item: any) => {
-              let img = item?.album?.images.reduce(
-                (smallest: imageType, curr: imageType) => {
-                  if (curr.width < smallest.width) return curr;
-                  return smallest;
-                }
-              );
-              return (
-                <div className="w-full h-auto" key={item.id}>
-                  <div className="flex justify-start items-center w-full min-h-[100px] my-1 p-3 rounded-2xl">
-                    <Avatar>
-                      <AvatarImage src={img.url}></AvatarImage>
-                      <AvatarFallback>Song</AvatarFallback>
-                    </Avatar>
-                    <div className="p-3 overflow-hidden">
-                      <p className="text-xl">{item.name}</p>
-                      <p className="text-xs">{item.album.name}</p>
+            {queueTracks?.items?.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No songs in queue yet</p>
+            ) : (
+              queueTracks?.items?.map((item: any) => {
+                let img = item?.album?.images.reduce(
+                  (smallest: imageType, curr: imageType) => {
+                    if (curr.width < smallest.width) return curr;
+                    return smallest;
+                  }
+                );
+                return (
+                  <div className="w-full h-auto" key={item.id}>
+                    <div className="flex justify-start items-center w-full min-h-[100px] my-1 p-3 rounded-2xl">
+                      <Avatar>
+                        <AvatarImage src={img.url}></AvatarImage>
+                        <AvatarFallback>Song</AvatarFallback>
+                      </Avatar>
+                      <div className="p-3 overflow-hidden">
+                        <p className="text-xl">{item.name}</p>
+                        <p className="text-xs">{item.album.name}</p>
+                      </div>
                     </div>
+                    <Separator />
                   </div>
-                  <Separator />
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </ScrollArea>
       </div>

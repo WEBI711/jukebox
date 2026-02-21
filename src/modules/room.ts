@@ -20,7 +20,8 @@ export default class room implements IRoom {
   add_song(uri: string) {
     this.track_queue = [...this.track_queue, uri];
     if (server.check()) {
-      server.socket?.to(this.room_id).emit("playlist_update", uri);
+      //server.socket?.to(this.room_id).emit("playlist_update", uri);
+      server.socket?.emit("playlist_update", uri);
     }
   }
 }
