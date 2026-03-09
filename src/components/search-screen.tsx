@@ -1,81 +1,91 @@
 "use client";
+
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { SpotifyImage, SpotifyTrack } from "@/modules/spotify-handler";
 
-type imageType = {
-  url: string;
-  width: number;
-  height: number;
-};
-type SearchScreenProps = {
-  room_id: string;
-  playHandler: (song_id: string) => Promise<void>;
-};
-export default function SearchScreen(props: SearchScreenProps) {
-  const [search, setSearch] = useState("");
-  const [searchedTracks, setSearchedTracks] = useState<any>([]);
+interface SearchScreenProps {
+  roomId: string;
+  onPlay: (songId: string) => Promise<void>;
+}
 
-  const searchHandler = async () => {
-    let search_request = await fetch(
-      `/api/spotifysearch?roomid=${encodeURIComponent(
-        props.room_id
-      )}&value=${encodeURIComponent(search)}`
-    );
-    let response = await search_request;
-    if (response.ok) {
-      let response_json = await response.json();
-      setSearchedTracks(response_json.data.tracks);
+interface SearchResult {
+  tracks: {
+    items: SpotifyTrack[];
+  };
+}
+
+function getSmallestImage(images: SpotifyImage[]): SpotifyImage | undefined {
+  return images?.reduce((smallest, current) =>
+    current.width < smallest.width ? current : smallest
+  );
+}
+
+function formatArtists(artists: { name: string }[]): string {
+  return artists.map((artist) => artist.name).join(", ");
+}
+
+export default function SearchScreen({ roomId, onPlay }: SearchScreenProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+
+    try {
+      const response = await fetch(
+        `/api/spotify-search?roomId=${encodeURIComponent(roomId)}&query=${encodeURIComponent(searchQuery)}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.data);
+      }
+    } catch (error) {
+      console.error("Search failed:", error);
     }
   };
+
+  const tracks = searchResults?.tracks?.items ?? [];
 
   return (
     <div className="h-3/4 w-1/2">
       <div className="flex w-full items-center gap-2 py-5">
         <Input
           type="text"
-          placeholder="Search"
-          onChange={(ev) => {
-            setSearch(ev.target.value);
-          }}
+          placeholder="Search for songs..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
-        <Button
-          type="submit"
-          variant="outline"
-          onClick={(ev) => searchHandler()}
-        >
+        <Button type="submit" variant="outline" onClick={handleSearch}>
           Search
         </Button>
       </div>
 
       <ScrollArea className="size-full rounded-md border p-4">
         <div className="size-full overflow-hidden">
-          {searchedTracks?.items?.map((item: any) => {
-            let img = item?.album?.images.reduce(
-              (smallest: imageType, curr: imageType) => {
-                if (curr.width < smallest.width) return curr;
-                return smallest;
-              }
-            );
+          {tracks.map((track) => {
+            const image = getSmallestImage(track.album.images);
+            
             return (
-              <div className="w-full h-auto" key={item.id}>
+              <div className="w-full h-auto" key={track.id}>
                 <div
-                  className="flex justify-start items-center w-full min-h-[100px] my-1 p-3 rounded-2xl hover:bg-neutral-700 cursor-pointer"
-                  onClick={() => props.playHandler(item.id)}
+                  className="flex justify-start items-center w-full min-h-[100px] my-1 p-3 rounded-2xl hover:bg-neutral-700 cursor-pointer transition-colors"
+                  onClick={() => onPlay(track.id)}
                 >
                   <Avatar>
-                    <AvatarImage src={img.url}></AvatarImage>
+                    <AvatarImage src={image?.url} />
                     <AvatarFallback>Song</AvatarFallback>
                   </Avatar>
                   <div className="p-3 overflow-hidden">
-                    <p className="text-xl">{item.name}</p>
+                    <p className="text-xl">{track.name}</p>
                     <p className="text-xs">
-                      {item?.album?.artists
-                        ?.map((artist: any) => artist.name)
-                        .join(", ")}
+                      {formatArtists(track.artists)}
                     </p>
                   </div>
                 </div>

@@ -1,26 +1,30 @@
-import spotifyHandler from "./spotifyHandler";
-import { spotifyTokenInfoType } from "@/types/spotifyToken";
-import type { tracks } from "@/types/trackTypes"
-import server from "@/modules/socketio_server"
-interface IRoom {
-  get_queue: () => string[];
+import { SpotifyTokenInfo } from "@/types/spotify-token";
+import server from "@/modules/socket-server";
+
+export interface IRoom {
+  getQueue: () => string[];
+  addSong: (uri: string) => void;
 }
-export default class room implements IRoom {
-  room_id: string;
-  token_info: spotifyTokenInfoType;
-  track_queue: string[];
-  constructor(room_id: string, token_info: spotifyTokenInfoType) {
-    this.room_id = room_id;
-    this.token_info = token_info;
-    this.track_queue = [];
+
+export default class Room implements IRoom {
+  roomId: string;
+  tokenInfo: SpotifyTokenInfo;
+  private trackQueue: string[];
+
+  constructor(roomId: string, tokenInfo: SpotifyTokenInfo) {
+    this.roomId = roomId;
+    this.tokenInfo = tokenInfo;
+    this.trackQueue = [];
   }
-  get_queue() {
-    return this.track_queue
+
+  getQueue(): string[] {
+    return [...this.trackQueue];
   }
-  add_song(uri: string) {
-    this.track_queue = [...this.track_queue, uri];
+
+  addSong(uri: string): void {
+    this.trackQueue = [...this.trackQueue, uri];
+    
     if (server.check()) {
-      //server.socket?.to(this.room_id).emit("playlist_update", uri);
       server.socket?.emit("playlist_update", uri);
     }
   }

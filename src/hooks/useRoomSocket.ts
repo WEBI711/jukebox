@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
 import { useRouter } from "next/navigation";
-import type {
-  ServerToClientEvents,
-  ClientToServerEvents,
-} from "@/types/socketTypes";
+import { io, Socket } from "socket.io-client";
+import type { ServerToClientEvents, ClientToServerEvents } from "@/types/socket";
+
+const SOCKET_SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://localhost:4000";
 
 export default function useRoomSocket(
-  room_id: string
+  roomId: string
 ): Socket<ServerToClientEvents, ClientToServerEvents> | null {
   const router = useRouter();
   const [socket, setSocket] = useState<Socket<
@@ -16,37 +15,41 @@ export default function useRoomSocket(
   > | null>(null);
 
   useEffect(() => {
-    const _socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-      `http://localhost:4000`,
+    const newSocket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
+      SOCKET_SERVER_URL,
       {
         transports: ["websocket", "polling"],
         withCredentials: true,
       }
     );
-    _socket.on("connect", () => {
-      console.log("connected");
-      _socket.emit("joinRoom", room_id);
+
+    newSocket.on("connect", () => {
+      console.log("Socket connected");
+      newSocket.emit("joinRoom", roomId);
     });
-    _socket.on("roomJoined", () => {
+
+    newSocket.on("roomJoined", () => {
       console.log("Room joined successfully");
     });
-    _socket.on("errorJoiningRoom", () => {
-      console.log("There was an error joining the room. Trying again");
+
+    newSocket.on("errorJoiningRoom", () => {
+      console.error("Error joining room. Retrying...");
       setTimeout(() => {
-        _socket.emit("joinRoom", room_id);
-      }, 100000);
+        newSocket.emit("joinRoom", roomId);
+      }, 10000);
     });
-    _socket.on("playlist_update", (uri) => {
-      console.log(`New song added to list with uri ${uri}`);
+
+    newSocket.on("playlist_update", (uri) => {
+      console.log(`New song added to playlist: ${uri}`);
       router.refresh();
     });
 
-    setSocket(_socket);
+    setSocket(newSocket);
 
     return () => {
-      _socket.disconnect();
+      newSocket.disconnect();
     };
-  }, [room_id]);
+  }, [roomId, router]);
 
   return socket;
 }

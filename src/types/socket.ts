@@ -9,8 +9,8 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
   hello: () => void;
-  joinRoom: (room: string) => void // TODO: replace room with room_id
-  play: (room_id: string, uri: string) => void // for testing
+  joinRoom: (roomId: string) => void;
+  play: (roomId: string, uri: string) => void;
 }
 
 export interface InterServerEvents {
